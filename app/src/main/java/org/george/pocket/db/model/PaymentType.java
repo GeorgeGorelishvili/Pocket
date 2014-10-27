@@ -12,6 +12,9 @@ public class PaymentType extends Model {
     @Column(name = "name", unique = true, notNull = true) // TODO [GG] on delete
     private String name;
 
+    @Column(name = "default_type")
+    private boolean appType;
+
     public PaymentType() {}
 
     public PaymentType(String name) {
@@ -24,6 +27,14 @@ public class PaymentType extends Model {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isAppType() {
+        return appType;
+    }
+
+    public void setAppType(boolean appType) {
+        this.appType = appType;
     }
 
     public List<Payment> payments() {

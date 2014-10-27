@@ -10,13 +10,20 @@
     <string-array name="nav_drawer_titles">
         <item>ახალი ჩანაწერი</item>
         <item>შემდეგი</item>
+        <item>რეპორტი</item>
+        <item>კონფიგურაცია</item>
     </string-array>
 
     <array name="nav_drawer_icons">
         <item>@drawable/ic_add_data</item>
         <item>@drawable/ic_logout</item>
+        <item>@drawable/ic_logout</item>
+        <item>@drawable/ic_logout</item>
     </array>
 
     <string name="desc_list_item_icon">Item Icon</string>
+    <string name="consumption_add">დამატება</string>
+    <string name="empty">ცარიელი ფრაგმენტი</string>
+
 
 </resources>

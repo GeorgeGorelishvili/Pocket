@@ -12,5 +12,6 @@ public interface CurrencyService {
 
     List<Currency> find();
 
+    Currency getDefault();
 
 }

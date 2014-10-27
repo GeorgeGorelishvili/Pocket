@@ -33,4 +33,17 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
     public void delete(long typeId) {
         new Delete().from(PaymentType.class).where("id = ?", typeId).execute();
     }
+
+    @Override
+    public PaymentType getDefault() {
+        /*PaymentType type = new Select().from(PaymentType.class).where("default_type = ?", 1).executeSingle();
+        if (type == null) {
+            type = new PaymentType(C.DEF.DEFAULT_TYPE_NAME);
+            type.setAppType(true);
+            type = PaymentType.load(PaymentType.class, type.save());
+        }
+        return type;
+        */
+        return null;
+    }
 }

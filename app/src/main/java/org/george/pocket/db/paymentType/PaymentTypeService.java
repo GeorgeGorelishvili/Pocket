@@ -13,4 +13,6 @@ public interface PaymentTypeService {
     List<PaymentType> getPaymentTypes();
 
     void delete(long typeId);
+
+    PaymentType getDefault();
 }

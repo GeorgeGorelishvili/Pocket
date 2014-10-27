@@ -2,46 +2,57 @@ package org.george.pocket;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.george.pocket.callback.NavigationDrawerCallback;
+import org.george.pocket.Consumption.ConsumptionFragment;
 import org.george.pocket.model.NavMenuItem;
 
 
-public class MainActivity extends Activity implements NavigationDrawerCallback {
+public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallback {
 
     // Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-    private static NavigationDrawerFragment navigationFragment;
+    private NavigationDrawerFragment navigationFragment;
 
     // Used to store the last screen title. For use in {@link #restoreActionBar()}.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        navigationFragment = (NavigationDrawerFragment)getFragmentManager().findFragmentById(R.id.navigation_drawer);
 
-        // Set up the drawer.
+        navigationFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
         navigationFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
+    public void onNavigationDrawerItemSelected(NavMenuItem item) {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onNavigationDrawerItemSelected");
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
+
+        Fragment fragment;
+        switch (item.getNavItem()) {
+            case HOME: fragment = ConsumptionFragment.newInstance(item); break;
+            default:    fragment = EmptyFragment.newInstance(item); break;
+        }
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position))
+                .replace(R.id.container, fragment)
                 .commit();
     }
 
-    public NavMenuItem onSectionAttached(int number) {
-        return navigationFragment.getCurrentItem(number);
+    public NavMenuItem onSectionAttached(NavMenuItem navMenuItem) {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onSectionAttached", navMenuItem != null ? navMenuItem.getTitle() : null);
+        navigationFragment.setCurrentItem(navMenuItem);
+        return navMenuItem;
     }
 
     public void restoreActionBar() {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "restoreActionBar");
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
@@ -50,6 +61,7 @@ public class MainActivity extends Activity implements NavigationDrawerCallback {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onCreateOptionsMenu");
         if (!navigationFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
@@ -63,6 +75,7 @@ public class MainActivity extends Activity implements NavigationDrawerCallback {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onOptionsItemSelected");
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
