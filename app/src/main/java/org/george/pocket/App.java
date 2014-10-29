@@ -21,19 +21,12 @@ public class App extends Application {
         self = this;
         App.BUILD_VERSION = Build.VERSION.SDK_INT;
         ActiveAndroid.initialize(getApplicationContext());
-//        initApp();
+        initApp();
     }
 
     private void initApp() {
-        initCurrency();
-        initType();
-    }
+        currency = PocketApi.getCurrencyService().getDefault();
 
-    private void initCurrency() {
-        this.currency = PocketApi.getCurrencyService().getDefault();
-    }
-
-    private void initType() {
-        this.type = PocketApi.getPaymentTypeService().getDefault();
+        type = PocketApi.getPaymentTypeService().getDefault();
     }
 }

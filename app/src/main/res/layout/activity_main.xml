@@ -21,11 +21,15 @@
          android:layout_gravity="left" instead. -->
     <!-- The drawer is given a fixed width in dp and extends the full height of
          the container. -->
-    <fragment android:id="@+id/navigation_drawer"
+    <ListView
+        android:id="@+id/list_sliderMenu"
         android:layout_width="@dimen/navigation_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:name="org.george.pocket.NavigationDrawerFragment"
-        tools:layout="@layout/fragment_navigation_drawer" />
+        android:choiceMode="singleChoice"
+        android:divider="@color/list_divider"
+        android:dividerHeight="1dp"
+        android:listSelector="@drawable/list_selector"
+        android:background="@color/list_background" />
 
 </android.support.v4.widget.DrawerLayout>

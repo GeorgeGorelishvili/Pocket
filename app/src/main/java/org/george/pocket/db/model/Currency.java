@@ -4,19 +4,24 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
-import java.util.List;
-
 @Table(name = "Currency")
 public class Currency extends Model {
 
-    @Column(name = "code", notNull = true)
-    private String code;
+    @Column(name = "code", notNull = true, unique = true)
+    public String code;
 
-    @Column(name = "default_currency")
-    private boolean appCurrency;
+    @Column(name = "active", notNull = true, length = 1)
+    public boolean active;
+
+    public Currency() {}
 
     public Currency(String code) {
         this.code = code;
+    }
+
+    public Currency(String code, boolean active) {
+        this.code = code;
+        this.active = active;
     }
 
     public String getCode() {
@@ -27,15 +32,11 @@ public class Currency extends Model {
         this.code = code;
     }
 
-    public boolean isAppCurrency() {
-        return appCurrency;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setAppCurrency(boolean appCurrency) {
-        this.appCurrency = appCurrency;
-    }
-
-    public List<Payment> payments() {
-        return getMany(Payment.class, "currency");
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

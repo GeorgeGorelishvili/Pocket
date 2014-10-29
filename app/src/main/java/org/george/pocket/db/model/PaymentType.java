@@ -4,21 +4,24 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
-import java.util.List;
-
 @Table(name = "payment_type")
 public class PaymentType extends Model {
 
-    @Column(name = "name", unique = true, notNull = true) // TODO [GG] on delete
+    @Column(name = "name", unique = true, notNull = true)
     private String name;
 
-    @Column(name = "default_type")
-    private boolean appType;
+    @Column(name = "active", notNull = true, length = 1)
+    public boolean active;
 
     public PaymentType() {}
 
     public PaymentType(String name) {
         this.name = name;
+    }
+
+    public PaymentType(String name, boolean active) {
+        this.name = name;
+        this.active = active;
     }
 
     public String getName() {
@@ -29,15 +32,11 @@ public class PaymentType extends Model {
         this.name = name;
     }
 
-    public boolean isAppType() {
-        return appType;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setAppType(boolean appType) {
-        this.appType = appType;
-    }
-
-    public List<Payment> payments() {
-        return getMany(Payment.class, "type");
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

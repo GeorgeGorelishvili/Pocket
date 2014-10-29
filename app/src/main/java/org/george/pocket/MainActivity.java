@@ -1,76 +1,64 @@
 package org.george.pocket;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import org.george.pocket.Consumption.ConsumptionFragment;
+import org.george.pocket.adapter.NavDrawerListAdapter;
+import org.george.pocket.model.NavItem;
 import org.george.pocket.model.NavMenuItem;
+import org.george.pocket.payment.PaymentFragment;
+
+import java.util.ArrayList;
 
 
-public class MainActivity extends Activity implements NavigationDrawerFragment.NavigationDrawerCallback {
+public class MainActivity extends ActionBarActivity {
 
-    // Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-    private NavigationDrawerFragment navigationFragment;
+    private DrawerLayout drawerLayout;
+    private ListView drawerListView;
+    private ActionBarDrawerToggle drawerToggle;
+
+    private NavMenuItem currentItem;
+    private ArrayList<NavMenuItem> navMenuItems;
+
+    private boolean fromSavedInstanceState;
+    private boolean userLearnedDrawer;
 
     // Used to store the last screen title. For use in {@link #restoreActionBar()}.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Logger.log(C.TAG.MAIN_ACTIVITY, "onCreate");
         super.onCreate(savedInstanceState);
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onCreate");
         setContentView(R.layout.activity_main);
 
-        navigationFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        navigationFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout));
-    }
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        userLearnedDrawer = sp.getBoolean(C.STATE.PREF_USER_LEARNED_DRAWER, false);
 
-    @Override
-    public void onNavigationDrawerItemSelected(NavMenuItem item) {
-        Logger.log(C.TAG.MAIN_ACTIVITY, "onNavigationDrawerItemSelected");
-        // update the main content by replacing fragments
-        FragmentManager fragmentManager = getFragmentManager();
+        initNavDrawerItems();
+        if (savedInstanceState != null && savedInstanceState.getSerializable(C.STATE.STATE_SELECTED_POSITION) != null) {
+            currentItem = (NavMenuItem)savedInstanceState.getSerializable(C.STATE.STATE_SELECTED_POSITION);
+            fromSavedInstanceState = true;
+        } else {
+            currentItem = navMenuItems.get(1);
 
-        Fragment fragment;
-        switch (item.getNavItem()) {
-            case HOME: fragment = ConsumptionFragment.newInstance(item); break;
-            default:    fragment = EmptyFragment.newInstance(item); break;
         }
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .commit();
-    }
-
-    public NavMenuItem onSectionAttached(NavMenuItem navMenuItem) {
-        Logger.log(C.TAG.MAIN_ACTIVITY, "onSectionAttached", navMenuItem != null ? navMenuItem.getTitle() : null);
-        navigationFragment.setCurrentItem(navMenuItem);
-        return navMenuItem;
-    }
-
-    public void restoreActionBar() {
-        Logger.log(C.TAG.MAIN_ACTIVITY, "restoreActionBar");
-        ActionBar actionBar = getActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(navigationFragment.getCurrentItem().getTitle());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        Logger.log(C.TAG.MAIN_ACTIVITY, "onCreateOptionsMenu");
-        if (!navigationFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.main, menu);
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
+        initDrawerLayout();
+        selectItem(currentItem);
     }
 
     @Override
@@ -79,10 +67,153 @@ public class MainActivity extends Activity implements NavigationDrawerFragment.N
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        return super.onOptionsItemSelected(item);
+
+        if (item.getItemId() == R.id.action_about) {
+            Toast.makeText(this, "About action.", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onCreateOptionsMenu");
+        if (drawerLayout != null && !drawerLayout.isDrawerOpen(drawerListView)) {
+            getMenuInflater().inflate(R.menu.main, menu);
+            restoreActionBar();
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onSaveInstanceState");
+
+        outState.putSerializable(C.STATE.STATE_SELECTED_POSITION, currentItem);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Logger.log(C.TAG.MAIN_ACTIVITY, "onConfigurationChanged");
+
+        // Forward the new configuration the drawer toggle component.
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    private void restoreActionBar() {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "restoreActionBar");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setTitle(R.string.app_name);
+    }
+
+    private void initDrawerLayout() {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "initDrawerLayout");
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+
+        drawerListView = (ListView)findViewById(R.id.list_sliderMenu);
+        drawerListView.setAdapter(new NavDrawerListAdapter(MainActivity.this, navMenuItems));
+        drawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectItem(navMenuItems.get(position));
+            }
+        });
+
+        drawerToggle = new ActionBarDrawerToggle(
+                MainActivity.this, drawerLayout, R.drawable.ic_drawer,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                getSupportActionBar().setTitle(currentItem.getTitle());
+                supportInvalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle(R.string.app_name);
+                if (!userLearnedDrawer) {
+                    userLearnedDrawer = true;
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                    sp.edit().putBoolean(C.STATE.PREF_USER_LEARNED_DRAWER, true).apply();
+                }
+                supportInvalidateOptionsMenu();
+            }
+        };
+
+        if (!userLearnedDrawer && !fromSavedInstanceState) {
+            drawerLayout.openDrawer(drawerListView);
+        }
+
+        drawerLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                drawerToggle.syncState();
+            }
+        });
+
+        drawerLayout.setDrawerListener(drawerToggle);
+    }
+
+    private void selectItem(NavMenuItem item) {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "setSelection: " + item.getNavItem().name());
+        // update the main content by replacing fragments
+        Fragment fragment = EmptyFragment.newInstance(item);
+        switch (item.getNavItem()) {
+            case HOME:      addReplaceFragment(new ConsumptionFragment(), item, true);     break;
+            case REPORT:    addReplaceFragment(new PaymentFragment(), item, true); break;
+            case CONFIG:    addReplaceFragment(new ConsumptionFragment(), item, true); break;
+            case NEXT:
+            default: addReplaceFragment(new EmptyFragment(), item, true); break;
+        }
+
+        currentItem = item;
+        if (drawerListView != null) {
+            drawerListView.setItemChecked(currentItem.getNavItem().ordinal(), true);
+            drawerListView.setSelection(currentItem.getNavItem().ordinal());
+        }
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(drawerListView);
+        }
+        getSupportActionBar().setTitle(item.getTitle());
+    }
+
+    private void addReplaceFragment(Fragment fragment, NavMenuItem item, boolean replace) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        if (replace) {
+            transaction.replace(R.id.container, fragment);
+        } else {
+            transaction.add(R.id.container, fragment);
+        }
+        transaction.commit();
+    }
+
+    private void initNavDrawerItems() {
+        Logger.log(C.TAG.MAIN_ACTIVITY, "initNavDrawerItems");
+        String[] navMenuTitles = getResources().getStringArray(R.array.nav_drawer_titles);
+        TypedArray navMenuIcons = getResources().obtainTypedArray(R.array.nav_drawer_icons);
+        navMenuItems = new ArrayList<>();
+        for (NavItem item : NavItem.values()) {
+            NavMenuItem menuItem = new NavMenuItem(item, navMenuTitles[item.ordinal()], navMenuIcons.getResourceId(item.ordinal(), -1));
+            navMenuItems.add(menuItem);
+        }
+        navMenuIcons.recycle();
     }
 }

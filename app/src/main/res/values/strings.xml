@@ -6,12 +6,18 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
+    <string name="action_about">About</string>
+    <string name="payment_list_empty">სია ცარიელია</string>
+    <string name="payment_next_page">მომდევნო გვერდის ჩატვირთვა</string>
+    <string name="payment_to_previous_page">წინა გვერდზე დაბრუნება</string>
+    <string name="refresh">განახლება</string>
+    <string name="loading">იტვირთება…</string>
 
     <string-array name="nav_drawer_titles">
         <item>ახალი ჩანაწერი</item>
-        <item>შემდეგი</item>
         <item>რეპორტი</item>
         <item>კონფიგურაცია</item>
+        <item>შემდეგი</item>
     </string-array>
 
     <array name="nav_drawer_icons">
@@ -24,6 +30,6 @@
     <string name="desc_list_item_icon">Item Icon</string>
     <string name="consumption_add">დამატება</string>
     <string name="empty">ცარიელი ფრაგმენტი</string>
-
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

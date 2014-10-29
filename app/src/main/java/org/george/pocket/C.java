@@ -19,6 +19,9 @@ public class C {
         public static final String MAIN_ACTIVITY = "MAIN_ACTIVITY";
         public static final String NAVIGATION_DRAWER_FRAGMENT = "NAVIGATION_DRAWER_FRAGMENT";
         public static final String CONSUMPTION_FRAGMENT = "CONSUMPTION_FRAGMENT";
+        public static final String REPORT_FRAGMENT = "REPORT_FRAGMENT";
+        public static final String CONFIGURATION_FRAGMENT = "CONFIGURATION_FRAGMENT";
+        public static final String QUERY = "QUERY";
 
     }
 

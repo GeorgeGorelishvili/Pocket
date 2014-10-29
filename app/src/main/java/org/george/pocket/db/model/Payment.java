@@ -9,33 +9,35 @@ import java.util.Date;
 @Table(name = "payment")
 public class Payment extends Model {
 
-    @Column(name = "create_date")
-    private Date creation;
+    @Column(name = "create_date", notNull = true)
+    public Date creationDate;
 
     @Column(name = "amount", notNull = true)
-    private Integer amount;
+    public Integer amount;
 
     @Column(name = "currency", notNull = true)
-    private Currency currency;
+    public String currency;
 
     @Column(name = "type", notNull = true)
-    private PaymentType type;
+    public String type;
 
-    public Payment() {}
+    public Payment() {
+        this.creationDate = new Date();
+    }
 
-    public Payment(Integer amount, Currency currency, PaymentType type) {
-        this.creation = new Date();
+    public Payment(Integer amount, String type, String currency) {
+        this.creationDate = new Date();
         this.amount = amount;
         this.type = type;
         this.currency = currency;
     }
 
-    public Date getCreation() {
-        return creation;
+    public Date getCreationDate() {
+        return creationDate;
     }
 
-    public void setCreation(Date creation) {
-        this.creation = creation;
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 
     public Integer getAmount() {
@@ -46,19 +48,19 @@ public class Payment extends Model {
         this.amount = amount;
     }
 
-    public Currency getCurrency() {
+    public String getCurrency() {
         return currency;
     }
 
-    public void setCurrency(Currency currency) {
+    public void setCurrency(String currency) {
         this.currency = currency;
     }
 
-    public PaymentType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(PaymentType type) {
+    public void setType(String type) {
         this.type = type;
     }
 }

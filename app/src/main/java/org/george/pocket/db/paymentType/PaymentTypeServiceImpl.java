@@ -3,6 +3,7 @@ package org.george.pocket.db.paymentType;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import org.george.pocket.C;
 import org.george.pocket.db.model.PaymentType;
 
 import java.util.List;
@@ -36,14 +37,11 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
 
     @Override
     public PaymentType getDefault() {
-        /*PaymentType type = new Select().from(PaymentType.class).where("default_type = ?", 1).executeSingle();
+        PaymentType type = new Select().from(PaymentType.class).where("active = ?", true).executeSingle();
         if (type == null) {
-            type = new PaymentType(C.DEF.DEFAULT_TYPE_NAME);
-            type.setAppType(true);
-            type = PaymentType.load(PaymentType.class, type.save());
+            type = new PaymentType(C.DEF.DEFAULT_TYPE_NAME, true);
+            type.save();
         }
         return type;
-        */
-        return null;
     }
 }

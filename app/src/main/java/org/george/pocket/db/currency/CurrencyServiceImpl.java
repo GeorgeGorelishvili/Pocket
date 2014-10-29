@@ -2,6 +2,7 @@ package org.george.pocket.db.currency;
 
 import com.activeandroid.query.Select;
 
+import org.george.pocket.C;
 import org.george.pocket.db.model.Currency;
 
 import java.util.List;
@@ -29,12 +30,11 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     @Override
     public Currency getDefault() {
-        /*Currency currency = new Select().from(Currency.class).where("default_currency = ?", 1).executeSingle();
+        Currency currency = new Select().from(Currency.class).where("active = ?", 1).executeSingle();
         if (currency == null) {
-            currency = new Currency(C.DEF.DEFAULT_CURRENCY_CODE);
-            currency = Currency.load(Currency.class, currency.save());
+            currency = new Currency(C.DEF.DEFAULT_CURRENCY_CODE, true);
+            currency.save();
         }
-        return currency;*/
-        return null;
+        return currency;
     }
 }

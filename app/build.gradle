@@ -29,4 +29,5 @@ dependencies {
     compile 'com.android.support:support-v4:20.0.0'
     compile project(':activeandroid-3.1')
     compile 'com.android.support:appcompat-v7:20.0.0'
+    compile project(':pull-to-refresh')
 }
