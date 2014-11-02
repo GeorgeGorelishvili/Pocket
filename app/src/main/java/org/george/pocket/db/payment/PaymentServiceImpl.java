@@ -3,6 +3,7 @@ package org.george.pocket.db.payment;
 import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
+import org.george.pocket.db.common.Paging;
 import org.george.pocket.db.model.Payment;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> find() {
-        return new Select().from(Payment.class).execute();
+    public List<Payment> find(Paging paging) {
+        return new Select().from(Payment.class).offset(paging.getOffset()).limit(paging.getLimit()).execute();
     }
 }

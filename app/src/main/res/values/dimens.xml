@@ -1,4 +1,8 @@
 <resources>
+    <dimen name="padding_5dp">5dp</dimen>
+    <dimen name="padding_10dp">10dp</dimen>
+    <dimen name="padding_2dp">2dp</dimen>
+    <dimen name="payment_list_item_padding">5dp</dimen>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -8,4 +12,9 @@
     <dimen name="navigation_drawer_width">240dp</dimen>
 
     <dimen name="form_padding">16dp</dimen>
+
+    <dimen name="tiny_text">8sp</dimen>
+    <dimen name="small_text">11sp</dimen>
+    <dimen name="medium_text">15sp</dimen>
+    <dimen name="big_text">20sp</dimen>
 </resources>

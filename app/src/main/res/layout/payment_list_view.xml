@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/padding_2dp"
+    android:background="#fff">
 
     <com.handmark.pulltorefresh.library.PullToRefreshListView
         android:id="@+id/payment_pull_to_refresh_list_view"
@@ -21,6 +22,7 @@
         android:id="@+id/search_result_footer_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="@dimen/padding_2dp"
         android:gravity="center"
         android:layout_alignParentBottom="true"/>
 

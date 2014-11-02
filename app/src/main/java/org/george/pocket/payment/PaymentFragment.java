@@ -16,22 +16,23 @@ import org.george.pocket.Logger;
 import org.george.pocket.R;
 import org.george.pocket.adapter.PaymentListAdapter;
 import org.george.pocket.db.PocketApi;
+import org.george.pocket.db.common.Paging;
 import org.george.pocket.db.model.Payment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentFragment extends Fragment {
 
     private PullToRefreshListView pullToRefreshListView;
-    private List<Payment> payments = new ArrayList<>();
+    private Paging paging = new Paging();
+    private View listView;
+    private PaymentListAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Logger.log(C.TAG.REPORT_FRAGMENT, "onCreate");
 
-        payments = PocketApi.getPaymentService().find();
         if (savedInstanceState != null) {
             // TODO [GG] save instance state
         }
@@ -41,43 +42,51 @@ public class PaymentFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Logger.log(C.TAG.REPORT_FRAGMENT, "onCreateView");
 
+        listView = inflater.inflate(R.layout.payment_list_view, container, false);
+
+        pullToRefreshListView = (PullToRefreshListView)listView.findViewById(R.id.payment_pull_to_refresh_list_view);
         View emptyView = inflater.inflate(R.layout.empty_list_view, container, false);
+        pullToRefreshListView.getRefreshableView().setEmptyView(emptyView);
+        pullToRefreshListView.getRefreshableView().setDivider(null);
+        pullToRefreshListView.getLoadingLayoutProxy().setPullLabel(getResources().getString(R.string.loading));
+        pullToRefreshListView.getLoadingLayoutProxy().setReleaseLabel(getResources().getString(R.string.payment_next_page));
+        pullToRefreshListView.getLoadingLayoutProxy().setRefreshingLabel(getResources().getString(R.string.refresh));
+        pullToRefreshListView.setMode(PullToRefreshBase.Mode.PULL_FROM_END);
+        pullToRefreshListView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
+            @Override
+            public void onRefresh(PullToRefreshBase<ListView> listViewPullToRefreshBase) {
+                pullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
+                Paging next = paging.getNext();
+                Logger.log(C.TAG.REPORT_FRAGMENT, "loading:: " + "offset: " + next.getOffset() + " limit: " + next.getLimit());
 
-        TextView emptyText = (TextView)emptyView.findViewById(R.id.empty_text);
-        emptyText.setText(R.string.payment_list_empty);
-
-        if (payments.size() > 0) {
-            Logger.log(C.TAG.REPORT_FRAGMENT, "List View");
-            View listView = inflater.inflate(R.layout.payment_list_view, container, false);
-
-            TextView status = (TextView)listView.findViewById(R.id.search_result_footer_text_view);
-            status.setText(R.string.app_name);
-
-            pullToRefreshListView = (PullToRefreshListView)listView.findViewById(R.id.payment_pull_to_refresh_list_view);
-            pullToRefreshListView.getRefreshableView().setEmptyView(emptyView);
-            pullToRefreshListView.getRefreshableView().setDivider(null);
-            pullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
-            pullToRefreshListView.getLoadingLayoutProxy().setPullLabel(getResources().getString(R.string.loading));
-            pullToRefreshListView.getLoadingLayoutProxy().setReleaseLabel(getResources().getString(R.string.payment_next_page));
-            pullToRefreshListView.getLoadingLayoutProxy().setRefreshingLabel(getResources().getString(R.string.refresh));
-            pullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
-
-            pullToRefreshListView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
-                @Override
-                public void onRefresh(PullToRefreshBase<ListView> listViewPullToRefreshBase) {
-                    payments = PocketApi.getPaymentService().find();
-                    pullToRefreshListView.onRefreshComplete();
+                List<Payment> list = PocketApi.getPaymentService().find(next);
+                if (list.size() > 0) {
+                    adapter.addAll(list);
+                    paging.update();
+                    pullToRefreshListView.setMode(PullToRefreshBase.Mode.PULL_FROM_END);
+                    updateStatus();
                 }
-            });
+                pullToRefreshListView.onRefreshComplete();
+            }
+        });
 
-            PaymentListAdapter adapter = new PaymentListAdapter(getActivity(), getActivity().getLayoutInflater(), payments);
-            pullToRefreshListView.getRefreshableView().setAdapter(adapter);
+        List<Payment> payments = PocketApi.getPaymentService().find(paging);
+        if (payments.size() > 0) {
+            updateStatus();
+        }
+
 //            pullToRefreshListView.setOnItemClickListener(this);
-            adapter.notifyDataSetChanged();
-            return listView;
-        } else {
-            Logger.log(C.TAG.REPORT_FRAGMENT, "Empty View");
-            return emptyView;
+        adapter = new PaymentListAdapter(getActivity(), getActivity().getLayoutInflater(), payments);
+        pullToRefreshListView.getRefreshableView().setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        return listView;
+    }
+
+    private void updateStatus() {
+        if (listView != null) {
+            TextView status = (TextView) listView.findViewById(R.id.search_result_footer_text_view);
+            String value = getResources().getString(R.string.page) + " " + paging.getPageNumber();
+            status.setText(value);
         }
     }
 }

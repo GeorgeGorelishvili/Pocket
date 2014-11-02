@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import org.george.pocket.Logger;
 import org.george.pocket.R;
 import org.george.pocket.db.model.Payment;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +44,6 @@ public class PaymentListAdapter extends ArrayAdapter<Payment> {
 
     @Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-        Logger.log("PAYMENT LIST ADAPTER", "getView");
         convertView = inflater.inflate(R.layout.payment_list_item_view, parent, false);
 
         Payment payment = payments.get(position);
@@ -63,6 +62,11 @@ public class PaymentListAdapter extends ArrayAdapter<Payment> {
         }
 		return convertView;
 	}
+
+    @Override
+    public void addAll(Collection<? extends Payment> collection) {
+        super.addAll(collection);
+    }
 
     private String getFormattedDate(Date date) {
         return DateFormat.format(DATE_TIME_FORMAT, date).toString();

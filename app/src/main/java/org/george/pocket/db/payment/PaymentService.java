@@ -1,5 +1,6 @@
 package org.george.pocket.db.payment;
 
+import org.george.pocket.db.common.Paging;
 import org.george.pocket.db.model.Payment;
 
 import java.util.List;
@@ -12,5 +13,5 @@ public interface PaymentService {
 
     void delete(long payment);
 
-    List<Payment> find();
+    List<Payment> find(Paging paging);
 }
